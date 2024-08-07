@@ -57,7 +57,6 @@ func (l *Library) BorrowBook(bookID int, memID int) error {
 						l.books[bookID] = book
 						mem.BorrowedBooks = append(mem.BorrowedBooks, book)
 						l.members[memID] = mem
-						fmt.Println(l.books)
 						fmt.Println("You have borrowed the book successfully")
 						return nil
 					}
