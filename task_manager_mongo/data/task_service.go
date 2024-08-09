@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	model "task_manager/models"
@@ -14,7 +15,7 @@ import (
 var client *mongo.Client
 
 func Dbconnect() error {
-	clientOption := options.Client().ApplyURI("Mongodb connection")
+	clientOption := options.Client().ApplyURI("mongodb://localhost:27017")
 	var err error
 	client, err = mongo.Connect(context.TODO(), clientOption)
 	if err != nil {
@@ -45,7 +46,7 @@ func Get_tasks() []model.Task {
 		return []model.Task{}
 	}
 	collection := client.Database("task_manager").Collection("tasks")
-	
+
 	cursor, err := collection.Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		return []model.Task{}
@@ -75,9 +76,19 @@ func Create_task(task model.Task) error {
 func Update_task(id string, updated model.Task) error {
 	collection := client.Database("task_manager").Collection("tasks")
 	filter := bson.D{{"id", id}}
-	_, err := collection.UpdateByID(context.TODO(), filter, updated)
+	update := bson.D{
+		{"$set", bson.D{
+			{"title", updated.Title},
+			{"description", updated.Description},
+			{"status", updated.Status}}}}
+
+	result, err := collection.UpdateOne(context.TODO(), filter, update)
+	fmt.Println("upd", result.ModifiedCount)
 	if err != nil {
 		return err
+	}
+	if result == nil || result.ModifiedCount == 0 {
+		return errors.New("Server error")
 	}
 	return nil
 }
