@@ -9,6 +9,7 @@ To install the MongoDB driver for Go, run the following command in your terminal
 
 Once the MongoDB driver installed
 * establish a  connection to your MongoDB instance by putting your database connection strings
+    put your connection string inside data/service.go file
 
 
 
