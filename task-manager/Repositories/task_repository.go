@@ -10,12 +10,12 @@ import (
 
 type taskRepository struct {
 	db         mongo.Database
-	collection mongo.Collection
+	collection *mongo.Collection
 }
 
 func NewTaskRepository(db mongo.Database) domain.TaskRepository {
 	return &taskRepository{
-		db: db, collection: *db.Collection("tasks"),
+		db: db, collection: db.Collection("tasks"),
 	}
 }
 
@@ -54,19 +54,19 @@ func (tr *taskRepository) GetTasks() []domain.Task {
 	return tasks
 }
 
-func (tr *taskRepository) UpdateTask(id string,task domain.Task) error {
-	filter:=bson.D{{"id",id}}
-	_,err:=tr.collection.UpdateOne(context.TODO(),filter,task)
-	if err!=nil{
+func (tr *taskRepository) UpdateTask(id string, task domain.Task) error {
+	filter := bson.D{{"id", id}}
+	_, err := tr.collection.UpdateOne(context.TODO(), filter, task)
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
 func (tr *taskRepository) DeleteTask(id string) error {
-	filter:=bson.D{{"id",id}}
-	_,err:=tr.collection.DeleteOne(context.TODO(),filter)
-	if err!=nil{
+	filter := bson.D{{"id", id}}
+	_, err := tr.collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
 		return err
 	}
 	return nil

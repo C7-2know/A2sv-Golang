@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	domain "task_manager/Domain"
 	"time"
@@ -10,8 +11,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var JwtSecret = "4533413ksandukjhuweas4const6"
+// var JwtSecret = []byte("4533413ksandukjhuweas4const6")
 
+var JwtSecret= []byte(os.Getenv("JwtSecret"))
 type jwtService struct{
 
 }
@@ -29,7 +31,7 @@ func (js *jwtService) GenerateToken(user domain.User) (string, error) {
 		})
 	jwtToken, err := token.SignedString(JwtSecret)
 	if err != nil {
-		return "", err
+		return "", errors.New("could not generate token")
 	}
 
 	return jwtToken, nil
@@ -53,17 +55,16 @@ func (js *jwtService) ValidateToken(role string,headers string) error {
 	if err != nil {
 		return err
 	}
-	if role!=""{
-		if claims,ok:= token.Claims.(jwt.MapClaims); ok && token.Valid{
-			// if token is expired
-			if float64(time.Now().Unix()) > claims["exp"].(float64){
-				return errors.New("Token expired")
-			}
-			// check if the role matches
-			if claims["role"]!=role{
-				return errors.New("Unauthorized user")
-			}
+	if claims,ok:= token.Claims.(jwt.MapClaims); ok && token.Valid{
+		// if token is expired
+		if float64(time.Now().Unix()) > claims["exp"].(float64){
+			return errors.New("Token expired")
+		}
+		// check if the role matches
+		if role!="" && claims["role"]!=role{
+			return errors.New("Unauthorized user")
 		}
 	}
+	
 	return nil
 }

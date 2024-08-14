@@ -20,10 +20,6 @@ func NewUserRepository(db mongo.Database) domain.UserRepository {
 }
 
 func (ur *userRepository) CreateUser(user domain.User) error {
-	// hashed_pass, err := middleware.HashPassword(user.Password)
-	// if err != nil {
-	// 	return err
-	// }
 	data := bson.D{
 		{"email", user.Email},
 		{"password", user.Password},
@@ -48,8 +44,13 @@ func (ur *userRepository) GetUserByEmail(email string) (domain.User, error) {
 
 func (ur *userRepository) UpdateUser(email string, update domain.User) error {
 	filter := bson.D{{"email", email}}
-
-	_, err := ur.collection.UpdateOne(context.TODO(), filter, update)
+	data:=bson.D{{"$set",bson.D{
+		{"email",update.Email},
+		{"password",update.Password},
+		{"name",update.Name},
+		{"role",update.Role},
+	}}}
+	_, err := ur.collection.UpdateOne(context.TODO(), filter, data)
 	if err != nil {
 		return err
 	}

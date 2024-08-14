@@ -7,9 +7,10 @@ import (
 
 func AuthMiddleware(role string) gin.HandlerFunc {
 	return func(c *gin.Context){
-		header:=c.GetHeader("Authorization")
+		header,_:=c.Cookie("Authorization")
 		err:=NewJwtService().ValidateToken(role,header)
 		if err!=nil{
+			c.JSON(401,gin.H{"error":err.Error()})
 			c.Abort()
 		}
 		c.Next()

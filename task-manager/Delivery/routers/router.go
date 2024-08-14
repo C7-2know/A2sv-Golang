@@ -15,16 +15,16 @@ func SetUp(db mongo.Database, gin *gin.Engine) {
 	pass_service := service.NewPasswordService()
 	jwt := service.NewJwtService()
 	publicRoute := gin.Group("")
-	NewSignUpRoute(pass_service,jwt,db, publicRoute)
+	NewSignUpRoute(pass_service, jwt, db, publicRoute)
 
 	userRoute := gin.Group("")
 	userRoute.Use(service.AuthMiddleware(""))
-	
+
 	NewUserRoute(pass_service, jwt, db, userRoute)
 
 	adminRoute := gin.Group("")
 	adminRoute.Use(service.AuthMiddleware("admin"))
-	NewAdminRoute(pass_service,jwt,db, adminRoute)
+	NewAdminRoute(pass_service, jwt, db, adminRoute)
 
 }
 
@@ -34,24 +34,25 @@ func NewSignUpRoute(pass domain.PasswordService, jwt domain.JWTService, db mongo
 	uu := usecases.NewUserUsecase(repository, pass, jwt)
 	controller := &controllers.UserController{User_usecase: uu}
 	// controller :=&controllers.UserController{user_usecase:userUsecase,}
+	uc := &controllers.UserController{User_usecase: uu}
 	route.POST("/register", controller.SignUp)
+	route.POST("/login", uc.LogIn)
+
 }
 
 func NewUserRoute(pass domain.PasswordService, jwt domain.JWTService, db mongo.Database, route *gin.RouterGroup) {
-	ur := repository.NewUserRepository(db)
+	// ur := repository.NewUserRepository(db)
 	tr := repository.NewTaskRepository(db)
-	uu := usecases.NewUserUsecase(ur, pass, jwt)
+	// uu := usecases.NewUserUsecase(ur, pass, jwt)
 	tu := usecases.NewTaskUsecase(tr)
-	uc := &controllers.UserController{User_usecase: uu}
 	tc := &controllers.TaskController{Task_usecase: tu}
-	route.GET("/login", uc.LogIn)
 	route.GET("/tasks", tc.GetTasks)
-	route.GET("/tasks:id", tc.GetTask)
+	route.GET("/tasks/:id", tc.GetTask)
 }
-func NewAdminRoute(pass domain.PasswordService, jwt domain.JWTService,db mongo.Database, route *gin.RouterGroup) {
+func NewAdminRoute(pass domain.PasswordService, jwt domain.JWTService, db mongo.Database, route *gin.RouterGroup) {
 	repo := repository.NewUserRepository(db)
 	tr := repository.NewTaskRepository(db)
-	uu := usecases.NewUserUsecase(repo,pass,jwt)
+	uu := usecases.NewUserUsecase(repo, pass, jwt)
 	tu := usecases.NewTaskUsecase(tr)
 
 	uc := &controllers.UserController{User_usecase: uu}

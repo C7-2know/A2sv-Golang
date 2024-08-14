@@ -1,6 +1,9 @@
 package usecases
 
-import domain "task_manager/Domain"
+import (
+	"errors"
+	domain "task_manager/Domain"
+)
 
 
 type TaskUsecase interface{
@@ -19,18 +22,39 @@ func NewTaskUsecase(task_repo domain.TaskRepository) domain.TaskUsecase {
 }
 
 func (tu *taskUsecase) CreateTask(task domain.Task)error{
-	return tu.Task_repo.CreateTask(task)
+	err:=tu.Task_repo.CreateTask(task)
+	if err!=nil{
+		return errors.New("could not create task")
+	}
+	return nil
 }
 func (tu *taskUsecase) GetTasks()[]domain.Task{
-	return tu.Task_repo.GetTasks()
+	tasks:=tu.Task_repo.GetTasks()
+	return tasks
 }
 func (tu *taskUsecase) GetTaskByID(id string)(domain.Task,error){
-	return tu.Task_repo.GetTaskByID(id)
+	task,err:= tu.Task_repo.GetTaskByID(id)
+	if err!=nil{
+		return domain.Task{},errors.New("Task not found")
+	}
+	return task,nil
 }
 func (tu *taskUsecase) UpdateTask(id string,task domain.Task)error{
-	return tu.Task_repo.UpdateTask(id,task)
+	_,err:=tu.Task_repo.GetTaskByID(id)
+	if err!=nil{
+		return errors.New("task not found")
+	}
+	err= tu.Task_repo.UpdateTask(id,task)
+	if err!=nil{
+		return errors.New("could not update task")
+	}
+	return nil
 }
 
 func (tu *taskUsecase) DeleteTask(id string)error{
-	return tu.Task_repo.DeleteTask(id)
+	err:= tu.Task_repo.DeleteTask(id)
+	if err!=nil{
+		return errors.New("could not delete task")
+	}
+	return nil
 }

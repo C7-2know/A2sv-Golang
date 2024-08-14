@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"errors"
 	domain "task_manager/Domain"
 )
 
@@ -31,11 +32,11 @@ func (uu *userUseCase) GetUserByEmail(email string) (domain.User, error) {
 func (uu *userUseCase) Login(email, password string) (string, error) {
 	user, err := uu.user_repo.GetUserByEmail(email)
 	if err != nil {
-		return "", err
+		return "", errors.New("user not found")
 	}
 	err = uu.password_service.ComparePassword(user.Password, password)
 	if err != nil {
-		return "", err
+		return "", errors.New("invalid password")
 	}
 	token, err := uu.jwt_service.GenerateToken(user)
 	if err != nil {
@@ -47,12 +48,12 @@ func (uu *userUseCase) Login(email, password string) (string, error) {
 func (uu *userUseCase) Promote(email string) error {
 	user, err := uu.user_repo.GetUserByEmail(email)
 	if err != nil {
-		return err
+		return errors.New("user not found")
 	}
 	user.Role = "admin"
 	err = uu.user_repo.UpdateUser(email, user)
 	if err != nil {
-		return err
+		return errors.New("could not promote user")
 	}
 	return nil
 }
