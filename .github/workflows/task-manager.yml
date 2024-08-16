@@ -28,5 +28,5 @@ jobs:
       - name: Run tests
         run: |
           cd task-manager/test
-          go test -tags='!secret' ./...
+          go test -tags='!local' ./...
 
