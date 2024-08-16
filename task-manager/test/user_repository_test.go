@@ -1,4 +1,4 @@
-// +build local
+// +build secret
 package test
 
 import (

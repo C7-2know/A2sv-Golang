@@ -21,6 +21,7 @@ type TaskRepositoryTestSuite struct {
 
 func (suite *TaskRepositoryTestSuite) SetupTest() {
 	options := options.Client().ApplyURI("mongodb://localhost:27017")
+
 	client, _ := mongo.Connect(context.Background(), options)
 	db := client.Database("test")
 	suite.db = db
