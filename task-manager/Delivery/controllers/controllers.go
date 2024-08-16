@@ -106,7 +106,11 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	tc.Task_usecase.UpdateTask(id, updated)
+	res:=tc.Task_usecase.UpdateTask(id, updated)
+	if res != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": res.Error()})
+		return
+	}
 	c.JSON(http.StatusOK, gin.H{"message": "task updated"})
 }
 

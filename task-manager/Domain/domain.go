@@ -13,7 +13,6 @@ type Task struct {
 }
 
 type User struct {
-	// ID 	 primitive.ObjectID `json:"id" bson:"_id" unique:"true"`
 	Name     string `json:"name"`
 	Email    string `json:"email" required:"true" unique:"true"`
 	Password string `json:"password,omitempty"`

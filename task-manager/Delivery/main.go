@@ -32,6 +32,6 @@ func main() {
 		log.Fatalf("Failed to ping MongoDB: %v", err)
 	}
 	db := client.Database("task_manager")
-	router.SetUp(*db, route)
+	router.SetUp(db, route)
 	route.Run(":8080")
 }

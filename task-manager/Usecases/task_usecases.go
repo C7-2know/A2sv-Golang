@@ -6,11 +6,7 @@ import (
 )
 
 
-type TaskUsecase interface{
-	CreateTask(task *domain.Task) error
-	GetAllTask() ([]domain.Task, error)
-	GetByIDTask(id int) (domain.Task, error)
-}
+
 
 
 type taskUsecase struct {

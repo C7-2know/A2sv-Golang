@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	domain "task_manager/Domain"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -9,11 +10,11 @@ import (
 )
 
 type userRepository struct {
-	db         mongo.Database
+	db         *mongo.Database
 	collection mongo.Collection
 }
 
-func NewUserRepository(db mongo.Database) domain.UserRepository {
+func NewUserRepository(db *mongo.Database) domain.UserRepository {
 	return &userRepository{
 		db: db, collection: *db.Collection("users"),
 	}
@@ -25,6 +26,9 @@ func (ur *userRepository) CreateUser(user domain.User) error {
 		{"password", user.Password},
 		{"name", user.Name},
 		{"role", user.Role}}
+	if user.Email == "" {
+		return errors.New("email is required")
+	}
 	_, err := ur.collection.InsertOne(context.TODO(), data)
 	if err != nil {
 		return err
@@ -44,15 +48,18 @@ func (ur *userRepository) GetUserByEmail(email string) (domain.User, error) {
 
 func (ur *userRepository) UpdateUser(email string, update domain.User) error {
 	filter := bson.D{{"email", email}}
-	data:=bson.D{{"$set",bson.D{
-		{"email",update.Email},
-		{"password",update.Password},
-		{"name",update.Name},
-		{"role",update.Role},
+	data := bson.D{{"$set", bson.D{
+		{"email", update.Email},
+		{"password", update.Password},
+		{"name", update.Name},
+		{"role", update.Role},
 	}}}
-	_, err := ur.collection.UpdateOne(context.TODO(), filter, data)
+	result, err := ur.collection.UpdateOne(context.TODO(), filter, data)
 	if err != nil {
 		return err
+	}
+	if result.MatchedCount == 0 {
+		return errors.New("no user found")
 	}
 	return nil
 }

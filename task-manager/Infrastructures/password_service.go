@@ -21,8 +21,8 @@ func (*passwordService) HashPassword(password string) (string, error) {
 	return string(hashedPass), nil
 }
 
-func (*passwordService)ComparePassword(pass1, pass2 string) error{
-	if bcrypt.CompareHashAndPassword([]byte(pass1), []byte(pass2)) != nil {
+func (*passwordService)ComparePassword(hahed, pass2 string) error{
+	if bcrypt.CompareHashAndPassword([]byte(hahed), []byte(pass2)) != nil {
 		return errors.New("passwords do not match")
 	}
 	return nil

@@ -11,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func SetUp(db mongo.Database, gin *gin.Engine) {
+func SetUp(db *mongo.Database, gin *gin.Engine) {
 	pass_service := service.NewPasswordService()
 	jwt := service.NewJwtService()
 	publicRoute := gin.Group("")
@@ -28,7 +28,7 @@ func SetUp(db mongo.Database, gin *gin.Engine) {
 
 }
 
-func NewSignUpRoute(pass domain.PasswordService, jwt domain.JWTService, db mongo.Database, route *gin.RouterGroup) {
+func NewSignUpRoute(pass domain.PasswordService, jwt domain.JWTService, db *mongo.Database, route *gin.RouterGroup) {
 	repository := repository.NewUserRepository(db)
 
 	uu := usecases.NewUserUsecase(repository, pass, jwt)
@@ -40,7 +40,7 @@ func NewSignUpRoute(pass domain.PasswordService, jwt domain.JWTService, db mongo
 
 }
 
-func NewUserRoute(pass domain.PasswordService, jwt domain.JWTService, db mongo.Database, route *gin.RouterGroup) {
+func NewUserRoute(pass domain.PasswordService, jwt domain.JWTService, db *mongo.Database, route *gin.RouterGroup) {
 	// ur := repository.NewUserRepository(db)
 	tr := repository.NewTaskRepository(db)
 	// uu := usecases.NewUserUsecase(ur, pass, jwt)
@@ -49,7 +49,7 @@ func NewUserRoute(pass domain.PasswordService, jwt domain.JWTService, db mongo.D
 	route.GET("/tasks", tc.GetTasks)
 	route.GET("/tasks/:id", tc.GetTask)
 }
-func NewAdminRoute(pass domain.PasswordService, jwt domain.JWTService, db mongo.Database, route *gin.RouterGroup) {
+func NewAdminRoute(pass domain.PasswordService, jwt domain.JWTService, db *mongo.Database, route *gin.RouterGroup) {
 	repo := repository.NewUserRepository(db)
 	tr := repository.NewTaskRepository(db)
 	uu := usecases.NewUserUsecase(repo, pass, jwt)
